@@ -146,3 +146,12 @@ function pos_on_board($element) {
         form_error($element, t($element['#title']. ' must be between a1 and h8 (see diagram below).'));
     }
 }
+
+/**
+ * Implements hook_form_validate().
+ */
+function queen_attack_form_validate($form, &$form_state) {
+  if ($form_state['values']['queen_pos'] === $form_state['values']['opp_pos']) {
+      form_set_error('', json_encode($form_state));
+  }
+}
