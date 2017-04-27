@@ -17,7 +17,7 @@ function pet_display() {
         <li>Dogwog</li>
         <li>"Let\'s use the sofa!"</li>
     </ul>
-    <img src="./sites/all/modules/pet/Trillium_Poncho_cat_dog.jpg" alt="Pet Cat and Dog" width="200">
+    <img src="./sites/all/modules/custom/pet/Trillium_Poncho_cat_dog.jpg" alt="Pet Cat and Dog" width="200">
 
     ';
 }
