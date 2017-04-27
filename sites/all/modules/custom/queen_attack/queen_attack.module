@@ -1,0 +1,148 @@
+<?php
+/**
+ * @file
+ * Epicodus Lab to use forms and validation.
+ */
+
+/**
+ * Define our name space in $_SESSION
+ */
+define('QUEEN_ATTACK_MODULE_SESSION_SPACE', 'queen_attack_module_session');
+
+/**
+ * Implements hook_menu().
+ */
+ function queen_attack_menu() {
+     $items['queen_attack'] = array(
+         'title' => 'Can the Queen Attack?',
+         'page callback' => 'queen_attack',
+         'access callback' => TRUE,
+         'type' => MENU_NORMAL_ITEM,
+     );
+
+     return $items;
+ }
+
+function col_to_char($row) {
+    // 1 to 8 maps to a to h
+    return chr(ord('a') + $row - 1);
+}
+
+function char_to_col($char) {
+    // a to h maps to 1 to 8
+    return ord(chr($char)) - ord(chr('a')) + 1;
+}
+
+function queen_pos($pos = '') {
+    if ($pos) {
+        $_SESSION[QUEEN_ATTACK_MODULE_SESSION_SPACE]['queen_pos'] = $pos;
+    } else {
+        if (
+            array_key_exists(QUEEN_ATTACK_MODULE_SESSION_SPACE, $_SESSION) &&
+            array_key_exists('queen_pos', $_SESSION[QUEEN_ATTACK_MODULE_SESSION_SPACE])
+        ) {
+            $pos = $_SESSION[QUEEN_ATTACK_MODULE_SESSION_SPACE]['queen_pos'];
+        }
+    }
+    return $pos;
+}
+
+function opp_pos($pos = '') {
+    if ($pos) {
+        $_SESSION[QUEEN_ATTACK_MODULE_SESSION_SPACE]['opp_pos'] = $pos;
+    } else {
+        if (
+            array_key_exists(QUEEN_ATTACK_MODULE_SESSION_SPACE, $_SESSION) &&
+            array_key_exists('opp_pos', $_SESSION[QUEEN_ATTACK_MODULE_SESSION_SPACE])
+        ) {
+            $pos = $_SESSION[QUEEN_ATTACK_MODULE_SESSION_SPACE]['opp_pos'];
+        }
+    }
+    return $pos;
+}
+
+/**
+ * Call back function for path.
+ */
+function queen_attack () {
+    $queen_pos = queen_pos();
+    $opp_pos = opp_pos();
+
+    $output = '';
+
+    $output.= '<table border="1">';
+    for ($row=8; $row > 0; $row--) {
+        $output.= '<tr>';
+        for ($col=1; $col < 9 ; $col++) {
+            $pos = col_to_char($col) . $row;
+            if ($pos === $queen_pos) {
+                $pos = 'Queen';
+            }
+            if ($pos === $opp_pos) {
+                $pos = 'Rook';
+            }
+            $output.= '<td>' . $pos . '</td>';
+        }
+        $output.= '</tr>';
+
+    }
+    $output.= '</table>';
+
+    $form_output = drupal_get_form('queen_attack_form');
+    $output .= drupal_render($form_output);
+
+    return $output;
+}
+
+/**
+ * Implements hook_form().
+ */
+function queen_attack_form() {
+    $form['queen_pos'] = array(
+        '#title' => 'Queen\'s Position (a1 - h8)',
+        '#type' => 'textfield',
+        '#description' => t('Specify the Queen\'s board position.'),
+        '#element_validate' => array('pos_on_board'),
+        '#required' => TRUE,
+    );
+    $form['opp_pos'] = array(
+        '#title' => 'Opposing Rook\'s Position (a1 - h8)',
+        '#type' => 'textfield',
+        '#description' => t('Specify the Rook\'s board position.'),
+        '#element_validate' => array('pos_on_board'),
+        '#required' => TRUE,
+    );
+    $form['submit'] = array(
+        '#type' => 'submit',
+        '#value' => 'Submit',
+    );
+
+    return $form;
+}
+
+/**
+ * Implements hook_form_submit().
+ */
+function queen_attack_form_submit($form, &$form_state) {
+    queen_pos($form_state['values']['queen_pos']);
+    opp_pos($form_state['values']['opp_pos']);
+}
+
+function pos_on_board($element) {
+    $error = FALSE;
+    $pos = trim($element['#value']);
+    if (strlen($pos) !== 2) {
+        $error = TRUE;
+    }
+    $char = substr($pos, 0, 1);
+    $number[0] = char_to_col($char);
+    $number[1] = substr($pos, 1, 1);
+    for ($i=0; $i < count($number); $i++) {
+        if ($number[$i] < 1 || $number[$i] > 8) {
+            $error = TRUE;
+        }
+    }
+    if ($error) {
+        form_error($element, t($element['#title']. ' must be between a1 and h8 (see diagram below).'));
+    }
+}

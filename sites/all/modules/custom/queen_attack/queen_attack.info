@@ -1,0 +1,5 @@
+name = Queen Attack!
+description = Given their positions on the chess board, can the queen attack the other piece?
+package = Epicodus Practice
+core = 7.x
+files[] = queen_attack.module
