@@ -1,0 +1,62 @@
+<?php
+/**
+ * @file
+ * Functional tests for the simple Greeting module.
+ */
+class LabroutesTests extends DrupalWebTestCase {
+
+  /**
+  * Controls info displayed about our test in the Drupal Testing UI
+  */
+  public static function getInfo() {
+    return array(
+      // Name your tests.
+      'name' => 'Labroutes Tests',
+      // Describe the point of these tests.
+      'description' => 'Tests the Labroutes module.',
+      // Assign these tests to a group, just like the "package" in the module's info page puts your modules into a group.
+      'group' => 'Epicodus Examples Tests',
+    );
+  }
+
+  public function setUp() {
+    //enable modules we need by putting their machine readable names into an array.
+    parent::setUp(array('labroutes'));
+  }
+
+    /**
+     * Perform the tasks we are testing, and assert the result. "Act" and then "Assert".
+     */
+    public function testLabroutesNavigation() {
+      // Navigate to the wrong URL.
+      $this->drupalGet('helo_friend');
+
+      // Assert NOT - Page not found
+      $this->assertText('Page not found', 'The above route is bad as expected.');
+
+      // Navigate to the URL created by the Greeting module.
+      $this->drupalGet('hello_friend');
+      // Assert that the text we want to see is actually there on the page.
+      $this->assertText('Hello my dear friend!', 'The text on the page is correct.');
+
+      // Navigate to the URL created by the Greeting module.
+      $this->drupalGet('farewell');
+      // Assert that the text we want to see is actually there on the page.
+      $this->assertText('Fare thee well my dear friend!', 'The text on the page is correct.');
+    }
+
+    public function testLoginLabroutes() {
+      $user = $this->drupalCreateAuthenticatedUser();
+      $this->drupalLogin($user);
+      $this->assertText('Hello my dear friend!', 'The user was successfully redirected. Woot!');
+    }
+
+    public function drupalCreateAuthenticatedUser(array $permissions = array()) {
+      $roles = user_roles();
+      $index = array_search('authenticated', $roles);
+      $user = $this->drupalCreateUser($permissions);
+      $user->roles[$index] = 'authenticated';
+      return user_save($user);
+    }
+    
+}

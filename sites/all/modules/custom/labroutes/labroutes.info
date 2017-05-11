@@ -3,3 +3,5 @@ description = Working with routes as Epicodus Lab
 package = Epicodus Practice
 core = 7.x
 files[] = labroutes.module
+files[] = labroutes.test
+files[] = labroutes_create_node.test
